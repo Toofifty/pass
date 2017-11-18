@@ -14,7 +14,6 @@ class NoteController extends Controller
 {
     public function index()
     {
-    	// return Note::find(3)->users()->get();
     	return Auth::user()->notes()->get();
     }
 
@@ -28,19 +27,12 @@ class NoteController extends Controller
     	// make new document key
     	$documentKey = Keys::generateKey();
 
-    	Log::info("DOCUMENT KEY: $documentKey");
-
     	// encrypt content with key
     	$encryptedContent = Keys::encrypt(request('content'), $documentKey);
 
-    	Log::info("CONTENT ".request('content'));
-    	Log::info("ENC CONTENT: $encryptedContent");
-
     	// encrypt key with user public key
-    	$userPub = Auth::user()->public_key;
-    	$encryptedDocKey = Keys::rsaEncrypt($documentKey, $userPub);
-
-    	Log::info("ENC DOCUMENT KEY: $encryptedDocKey");
+    	$public = Auth::user()->public_key;
+    	$encryptedDocKey = Keys::rsaEncrypt($documentKey, $public);
 
     	// push to database
     	$note = null;

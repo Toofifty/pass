@@ -21,7 +21,6 @@
     </div>
 </div>
 <div class="container" id="app">
-    <get-key></get-key>
     <note-list></note-list>
 </div>
 @endsection

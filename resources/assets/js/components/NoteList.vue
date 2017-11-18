@@ -66,13 +66,6 @@ export default {
 			axios.delete('api/notes/' + id).then((res) => {
 				this.fetchNoteList()
 			}).catch((err) => console.error(err))
-		},
-
-		decryptNote (id) {
-			if (localStorage.private_key && localStorage.private_key !== '') {
-				// this.list[id].content = 
-			}
-			this.list[id].content = 'yes'
 		}
 	}
 }

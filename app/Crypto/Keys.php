@@ -4,50 +4,31 @@ namespace App\Crypto;
 
 use Illuminate\Encryption\Encrypter;
 use phpseclib\Crypt\RSA;
+use phpseclib\Crypt\AES;
+use phpseclib\Crypt\Random;
 
 class Keys
 {
-    protected static function config()
-    {
-    	return [
-	        'digest_alg' => 'sha512',
-	        'private_key_bits' => 4096,
-	        'private_key_type' => OPENSSL_KEYTYPE_RSA
-	    ];
-	}
-
+    /**
+     * Generate a new keypair.
+     *
+     * @return array
+     */
     public static function generate()
     {
-        // return openssl_pkey_new(self::config());
         $rsa = new RSA();
         return $rsa->createKey();
     }
 
-    public static function private($keys)
-    {
-    	openssl_pkey_export($keys, $out);
-    	return $out;
-    }
-
-    public static function privateEncrypt($data, $key)
-    {
-        openssl_private_encrypt($data, $out, $key);
-        return $out;
-    }
-
-    public static function privateDecrypt($data, $key)
-    {
-        if (!openssl_private_decrypt($data, $out, $key)) {
-            return openssl_error_string();
-        }
-        return $out;
-    }
-
-    public static function public($keys)
-    {
-    	return openssl_pkey_get_details($keys)['key'];
-    }
-
+    /**
+     * Encrypt data using an RSA public key, so it can
+     * only be decrypted with the corresponding
+     * private key.
+     *
+     * @param string $data
+     * @param string $key public key
+     * @return string
+     */
     public static function rsaEncrypt($data, $key)
     {
         $rsa = new RSA();
@@ -55,6 +36,14 @@ class Keys
         return base64_encode($rsa->encrypt($data));
     }
 
+    /**
+     * Decrypt data using a matching RSA private key to
+     * the public key that encrypted it.
+     *
+     * @param string $data
+     * @param string $key private key
+     * @return string
+     */
     public static function rsaDecrypt($data, $key)
     {
         $rsa = new RSA();
@@ -62,48 +51,46 @@ class Keys
         return $rsa->decrypt(base64_decode($data));
     }
 
-    public static function publicDecrypt($data, $key)
-    {
-        openssl_public_decrypt(base64_decode($data), $out, $key);
-        return $out;
-    }
-
+    /**
+     * Encrypt data using the AES 256 cipher.
+     *
+     * @param string $data
+     * @param string $key (or password)
+     * @return string
+     */
     public static function encrypt($data, $key)
     {
-        $method = 'AES-256-CBC';
-        $key = hash('sha256', $key, true);
-        $iv = openssl_random_pseudo_bytes(16);
-
-        $cipher = openssl_encrypt($data, $method, $key, OPENSSL_RAW_DATA, $iv);
-        $hash = hash_hmac('sha256', $cipher, $key, true);
-
-        return base64_encode($iv . $hash . $cipher);
+        $aes = new AES();
+        $aes->setPassword($key);
+        // TODO: implement IV
+        // $aes->setIV(Random::string($aes->getBlockLength() >> 3));
+        return base64_encode($aes->encrypt($data));
     }
 
+    /**
+     * Decrypt data using the AES 256 cipher.
+     *
+     * @param string $data
+     * @param string $key (or password)
+     * @return string
+     */
     public static function decrypt($data, $key)
     {
-        $data = base64_decode($data);
-
-        $method = 'AES-256-CBC';
-        $iv = substr($data, 0, 16);
-        $hash = substr($data, 16, 32);
-        $cipher = substr($data, 48);
-        $key = hash('sha256', $key, true);
-
-        if (hash_hmac('sha256', $cipher, $key, true) !== $hash) {
-            return null;
-        }
-
-        return openssl_decrypt($cipher, $method, $key, OPENSSL_RAW_DATA, $iv);
+        $aes = new AES();
+        $aes->setPassword($key);
+        // $aes->setIV(Random::string($aes->getBlockLength() >> 3));
+        return $aes->decrypt(base64_decode($data));
     }
 
+    /**
+     * Generate key to use for AES ciphers, and document keys
+     * down the line.
+     *
+     * @param int $length
+     * @return string
+     */
     public static function generateKey($length = 128)
     {
-        return base64_encode(openssl_random_pseudo_bytes($length));
-    }
-
-    public static function encryptedPrivate($keys, $password)
-    {
-    	return self::encrypt(self::private($keys), $password);
+        return Random::string($length);
     }
 }

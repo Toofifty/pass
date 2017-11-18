@@ -20,7 +20,9 @@ class LoginController extends Controller
     |
     */
 
-    use AuthenticatesUsers;
+    use AuthenticatesUsers {
+        sendLoginResponse as protected _sendLoginResponse;
+    }
 
     /**
      * Where to redirect users after login.
@@ -39,41 +41,29 @@ class LoginController extends Controller
         $this->middleware('guest')->except('logout');
     }
 
+    /**
+     * Decrypt and add the user's private key to the session
+     * to be used later.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return void
+     */
     public function addKeys($request)
     {
-        $private = Keys::decrypt(Auth::user()->privaye_key, $request['password']);
+        $private = Keys::decrypt(Auth::user()->private_key, $request['password']);
         session(['private_key' => $private]);
     }
 
     /**
-     * Handle a login request to the application.
+     * Send the response after the user was authenticated.
+     * Overridden to add the private key to the session.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\Http\JsonResponse
+     * @return \Illuminate\Http\Response
      */
-    public function login(Request $request)
+    public function sendLoginResponse(Request $request)
     {
-        $this->validateLogin($request);
-
-        // If the class is using the ThrottlesLogins trait, we can automatically throttle
-        // the login attempts for this application. We'll key this by the username and
-        // the IP address of the client making these requests into this application.
-        if ($this->hasTooManyLoginAttempts($request)) {
-            $this->fireLockoutEvent($request);
-
-            return $this->sendLockoutResponse($request);
-        }
-
-        if ($this->attemptLogin($request)) {
-            $this->addKeys($request);
-            return $this->sendLoginResponse($request);
-        }
-
-        // If the login attempt was unsuccessful we will increment the number of attempts
-        // to login and redirect the user back to the login form. Of course, when this
-        // user surpasses their maximum number of attempts they will get locked out.
-        $this->incrementLoginAttempts($request);
-
-        return $this->sendFailedLoginResponse($request);
+        $this->addKeys($request);
+        return $this->_sendLoginResponse($request);
     }
 }

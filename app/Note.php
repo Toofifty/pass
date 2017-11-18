@@ -19,15 +19,16 @@ class Note extends Model
         return $this->belongsToMany('App\User', 'user_note')->using('App\UserNote');
     }
 
+    /**
+     * Get the decrypted content using the user's private key.
+     *
+     * @return $string
+     */
     public function getDecryptedContentAttribute()
     {
     	$private = session('private_key');
-    	// \Log::info($private);
-    	\Log::info($this->pivot->document_key);
     	$document_key = Keys::rsaDecrypt($this->pivot->document_key, $private);
-    	\Log::info($document_key);
     	$content = Keys::decrypt($this->content, $document_key);
-    	\Log::info($content);
     	return $content;
     }
 }

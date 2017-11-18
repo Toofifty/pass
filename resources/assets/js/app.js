@@ -8,7 +8,6 @@
 require('./bootstrap');
 
 window.Vue = require('vue');
-window.aes = require('crypto-js/aes');
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to
