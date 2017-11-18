@@ -32,6 +32,15 @@ class User extends Authenticatable
      */
     public function notes()
     {
-        return $this->belongsToMany('App\Note', 'user_note')->using('App\UserNote')->withPivot('document_key');
+        return $this
+            ->belongsToMany('App\Note', 'user_note')
+            ->withPivot('document_key');
+    }
+
+    public function websiteLogins()
+    {
+        return $this
+            ->belongsToMany('App\WebsiteLogin', 'user_website_login')
+            ->withPivot('document_key');
     }
 }

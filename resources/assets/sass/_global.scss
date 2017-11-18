@@ -1,0 +1,29 @@
+body {
+	overflow: hidden;
+	min-height: 100vh;
+
+	&:before {
+		content: '';
+		background: darken($body-bg, 4%);
+		width: 200%;
+		height: 100%;
+		left: 0;
+		top: 100%;
+		position: absolute;
+		transform-origin: 0 0 0;
+		transform: rotate(-20deg);
+	}
+
+	&:after {
+		content: '';
+		background: lighten($body-bg, 10%);
+		width: 200%;
+		height: 100%;
+		left: 0;
+		top: 100%;
+		position: absolute;
+		transform-origin: 0 0 0;
+		transform: rotate(-21deg);
+		z-index: -1;
+	}
+}

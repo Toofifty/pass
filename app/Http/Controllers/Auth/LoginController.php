@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\Keys;
+use App\Crypto\Keys;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
@@ -50,7 +50,7 @@ class LoginController extends Controller
      */
     public function addKeys($request)
     {
-        $private = Keys::decrypt(Auth::user()->private_key, $request['password']);
+        $private = Keys::decrypt(\Auth::user()->private_key, $request['password']);
         session(['private_key' => $private]);
     }
 

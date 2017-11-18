@@ -1,20 +1,18 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Store;
 
 use App\Note;
 use App\UserNote;
 use App\Crypto\Keys;
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 
 class NoteController extends Controller
 {
     public function index()
     {
-    	return Auth::user()->notes()->get();
+    	return \Auth::user()->notes()->get();
     }
 
     public function store(Request $request)
@@ -31,19 +29,19 @@ class NoteController extends Controller
     	$encryptedContent = Keys::encrypt(request('content'), $documentKey);
 
     	// encrypt key with user public key
-    	$public = Auth::user()->public_key;
+    	$public = \Auth::user()->public_key;
     	$encryptedDocKey = Keys::rsaEncrypt($documentKey, $public);
 
     	// push to database
     	$note = null;
-    	DB::transaction(function () use ($encryptedContent, $encryptedDocKey) {
+    	\DB::transaction(function () use ($encryptedContent, $encryptedDocKey) {
 			$note = Note::create([
 	    		'title' => request('title'),
 	    		'content' => $encryptedContent
 	    	]);
 
 	    	UserNote::create([
-	    		'user_id' => Auth::user()->id,
+	    		'user_id' => \Auth::user()->id,
 	    		'note_id' => $note->id,
 	    		'document_key' => $encryptedDocKey,
 	    		'permission' => 'owner'

@@ -67,10 +67,7 @@ class RegisterController extends Controller
         $keys = Keys::generate();
         $public = $keys['publickey'];
         $private = $keys['privatekey'];
-
-        \Log::info($public);
-        \Log::info($private);
-
+        
         // Store the unencryted private key in
         // the session, so it can be used instantly
         session(['private_key' => $private]);

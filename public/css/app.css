@@ -8350,3 +8350,37 @@ button.close {
   }
 }
 
+body {
+  overflow: hidden;
+  min-height: 100vh;
+}
+
+body:before {
+  content: '';
+  background: #e7eef3;
+  width: 200%;
+  height: 100%;
+  left: 0;
+  top: 100%;
+  position: absolute;
+  -webkit-transform-origin: 0 0 0;
+          transform-origin: 0 0 0;
+  -webkit-transform: rotate(-20deg);
+          transform: rotate(-20deg);
+}
+
+body:after {
+  content: '';
+  background: white;
+  width: 200%;
+  height: 100%;
+  left: 0;
+  top: 100%;
+  position: absolute;
+  -webkit-transform-origin: 0 0 0;
+          transform-origin: 0 0 0;
+  -webkit-transform: rotate(-21deg);
+          transform: rotate(-21deg);
+  z-index: -1;
+}
+

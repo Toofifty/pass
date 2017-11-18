@@ -7,16 +7,17 @@ use Illuminate\Database\Eloquent\Model;
 
 class Note extends Model
 {
-    protected $guarded = [];
-
     protected $appends = ['decrypted_content'];
+    protected $hidden = ['content'];
 
     /**
      * The users that belong to the note.
      */
     public function users()
     {
-        return $this->belongsToMany('App\User', 'user_note')->using('App\UserNote');
+        return $this
+            ->belongsToMany('App\User', 'user_note')
+            ->withPivot();
     }
 
     /**
