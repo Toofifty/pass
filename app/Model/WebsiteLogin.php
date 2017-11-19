@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace App\Model;
 
 use App\Crypto\Keys;
 use Illuminate\Database\Eloquent\Model;
@@ -17,8 +17,8 @@ class WebsiteLogin extends Model
     public function users()
     {
         return $this
-            ->belongsToMany('App\User', 'user_website_login')
-            ->using('App\UserWebsiteLogin');
+            ->belongsToMany('App\Model\User', 'user_website_login')
+            ->using('App\Relation\UserWebsiteLogin');
     }
 
     /**

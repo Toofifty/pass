@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Store;
 
-use App\Vault;
-use App\UserVault;
-use App\VaultVault;
+use App\Model\Vault;
+use App\Relation\UserVault;
+use App\Relation\VaultVault;
 use App\Crypto\Keys;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;

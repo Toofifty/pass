@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Store;
 
-use App\WebsiteLogin;
-use App\UserWebsiteLogin;
-use App\VaultWebsiteLogin;
+use App\Model\WebsiteLogin;
+use App\Relation\UserWebsiteLogin;
+use App\Relation\VaultWebsiteLogin;
 use App\Crypto\Keys;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;

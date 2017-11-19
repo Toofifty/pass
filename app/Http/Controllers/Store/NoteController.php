@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\Store;
 
-use App\Note;
-use App\UserNote;
+use App\Model\Note;
+use App\Relation\UserNote;
 use App\Crypto\Keys;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;

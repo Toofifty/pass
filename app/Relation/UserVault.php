@@ -1,10 +1,10 @@
 <?php
 
-namespace App;
+namespace App\Relation;
 
 use Illuminate\Database\Eloquent\Relations\Pivot;
 
-class VaultVault extends Pivot
+class UserVault extends Pivot
 {
     //
 }

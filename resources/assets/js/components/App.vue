@@ -1,5 +1,5 @@
 <template>
-	<div class="container" id="app">
+	<div class="container-fluid" id="app">
 	    <div class="col-sm-4">
 	    	<vault-list
 	    		:vaults="vaults"

@@ -19,11 +19,7 @@ Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
 
-Route::get('/notes/new', function () {
-	return view('store/notes/new');
-});
-
-Route::prefix('api')->group(function () {
+Route::prefix('api')->middleware('auth')->group(function () {
 	Route::resource('store/vaults', 'Store\VaultController');
 	Route::get('store/vaults/{id}/all', 'Store\VaultController@all');
 	Route::resource('store/notes', 'Store\NoteController');

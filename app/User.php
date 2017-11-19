@@ -33,7 +33,7 @@ class User extends Authenticatable
     public function notes()
     {
         return $this
-            ->belongsToMany('App\Note', 'user_note')
+            ->belongsToMany('App\Model\Note', 'user_note')
             ->withPivot('document_key');
     }
 
@@ -43,7 +43,7 @@ class User extends Authenticatable
     public function vaults()
     {
         return $this
-            ->belongsToMany('App\Vault', 'user_vault')
+            ->belongsToMany('App\Model\Vault', 'user_vault')
             ->withPivot('document_key');
     }
 
@@ -53,7 +53,7 @@ class User extends Authenticatable
     public function websiteLogins()
     {
         return $this
-            ->belongsToMany('App\WebsiteLogin', 'user_website_login')
+            ->belongsToMany('App\Model\WebsiteLogin', 'user_website_login')
             ->withPivot('document_key');
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace App\Model;
 
 use App\Crypto\Keys;
 use Illuminate\Database\Eloquent\Model;
@@ -17,28 +17,28 @@ class Vault extends Model
     public function users()
     {
         return $this
-            ->belongsToMany('App\User', 'user_vault')
+            ->belongsToMany('App\Model\User', 'user_vault')
             ->withPivot('permission');
     }
 
     public function websiteLogins()
     {
         return $this
-            ->belongsToMany('App\WebsiteLogin', 'vault_website_login')
+            ->belongsToMany('App\Model\WebsiteLogin', 'vault_website_login')
             ->withPivot('permission');
     }
 
     public function parents()
     {
         return $this
-            ->belongsToMany('App\Vault', 'vault_vault', 'child_id', 'parent_id')
+            ->belongsToMany('App\Model\Vault', 'vault_vault', 'child_id', 'parent_id')
             ->withPivot('permission');
     }
 
     public function children()
     {
         return $this
-            ->belongsToMany('App\Vault', 'vault_vault', 'parent_id', 'child_id')
+            ->belongsToMany('App\Model\Vault', 'vault_vault', 'parent_id', 'child_id')
             ->withPivot('permission');
     }
 }
