@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\Store;
 
-use App\Note;
-use App\UserNote;
+use App\WebsiteLogin;
+use App\UserWebsiteLogin;
 use App\Crypto\Keys;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -18,36 +18,41 @@ class WebsiteLoginController extends Controller
     public function store(Request $request)
     {
     	$this->validate($request, [
-    		'title' => 'required|max:500',
-    		'content' => 'required|max:500'
+    		'title' => 'required|max:500'
     	]);
 
     	// make new document key
     	$documentKey = Keys::generateKey();
 
-    	// encrypt content with key
-    	$encryptedContent = Keys::encrypt(request('content'), $documentKey);
+    	// encrypt password and notes with key
+        $encryptedPassword = Keys::encrypt(request('password'), $documentKey);
+        $encryptedNotes = Keys::encrypt(request('notes'), $documentKey);
 
     	// encrypt key with user public key
-    	$public = Auth::user()->public_key;
+    	$public = \Auth::user()->public_key;
     	$encryptedDocKey = Keys::rsaEncrypt($documentKey, $public);
 
     	// push to database
-    	$note = null;
-    	DB::transaction(function () use ($encryptedContent, $encryptedDocKey) {
-			$note = Note::create([
-	    		'title' => request('title'),
-	    		'content' => $encryptedContent
-	    	]);
+    	$websiteLogin = null;
+    	\DB::transaction(function () use ($encryptedPassword, $encryptedNotes, $encryptedDocKey) {
+            $websiteLogin = WebsiteLogin::create([
+                'title' => request('title'),
+                'url' => request('url'),
+                'domain' => request('domain'),
+                'username' => request('username'),
+                'password' => $encryptedPassword,
+                'notes' => $encryptedNotes,
+                'icon' => request('icon')
+            ]);
 
-	    	UserNote::create([
-	    		'user_id' => Auth::user()->id,
-	    		'note_id' => $note->id,
-	    		'document_key' => $encryptedDocKey,
-	    		'permission' => 'owner'
-	    	]);
+            UserWebsiteLogin::create([
+                'user_id' => \Auth::user()->id,
+                'website_login_id' => $websiteLogin->id,
+                'document_key' => $encryptedDocKey,
+                'permission' => 'owner'
+            ]);
     	});
-    	return $note;
+    	return $websiteLogin;
     }
 
     public function destroy($id)

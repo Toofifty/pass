@@ -17,6 +17,7 @@ class Notes extends Migration
             $table->increments('id');
             $table->string('title');
             $table->longText('content');
+            $table->binary('icon')->nullable();
             $table->timestamps();
         });
     }

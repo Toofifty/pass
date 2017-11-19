@@ -5,8 +5,9 @@ namespace App;
 use App\Crypto\Keys;
 use Illuminate\Database\Eloquent\Model;
 
-class LoginWebsite extends Model
+class WebsiteLogin extends Model
 {
+    protected $guarded = [];
     protected $appends = ['decrypted_password'];
     protected $hidden = ['password'];
 
@@ -15,7 +16,9 @@ class LoginWebsite extends Model
      */
     public function users()
     {
-        return $this->belongsToMany('App\User', 'user_website_login')->using('App\UserWebsiteLogin');
+        return $this
+            ->belongsToMany('App\User', 'user_website_login')
+            ->using('App\UserWebsiteLogin');
     }
 
     /**

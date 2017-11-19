@@ -13,11 +13,11 @@ class Vault extends Migration
      */
     public function up()
     {
-        Schema::create('vault', function (Blueprint $table) {
+        Schema::create('vaults', function (Blueprint $table) {
             $table->increments('id');
             $table->string('title');
             $table->longText('notes');
-            $table->binary('icon');
+            $table->binary('icon')->nullable();
             $table->timestamps();
         });
     }
@@ -29,6 +29,6 @@ class Vault extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('vault');
+        Schema::dropIfExists('vaults');
     }
 }

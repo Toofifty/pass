@@ -8382,5 +8382,7 @@ body:after {
   -webkit-transform: rotate(-21deg);
           transform: rotate(-21deg);
   z-index: -1;
+  -webkit-box-shadow: 0 0 200px #e7eef3;
+          box-shadow: 0 0 200px #e7eef3;
 }
 

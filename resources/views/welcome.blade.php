@@ -79,7 +79,7 @@
 
             <div class="content">
                 <div class="title m-b-md">
-                    Laravelloooooooo
+                    PASS
                 </div>
 
                 <div class="links">

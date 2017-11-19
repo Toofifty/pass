@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Note extends Model
 {
+    protected $guarded = [];
     protected $appends = ['decrypted_content'];
     protected $hidden = ['content'];
 

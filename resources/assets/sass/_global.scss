@@ -25,5 +25,6 @@ body {
 		transform-origin: 0 0 0;
 		transform: rotate(-21deg);
 		z-index: -1;
+		box-shadow: 0 0 200px darken($body-bg, 4%);
 	}
 }

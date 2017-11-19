@@ -13,15 +13,15 @@ class WebsiteLogin extends Migration
      */
     public function up()
     {
-        Schema::create('website_login', function (Blueprint $table) {
+        Schema::create('website_logins', function (Blueprint $table) {
             $table->increments('id');
             $table->string('title');
-            $table->string('url');
-            $table->string('domain');
-            $table->string('username');
-            $table->string('password');
-            $table->longText('notes');
-            $table->binary('icon');
+            $table->string('url')->nullable();
+            $table->string('domain')->nullable();
+            $table->string('username')->nullable();
+            $table->string('password')->nullable();
+            $table->longText('notes')->nullable();
+            $table->binary('icon')->nullable();
             $table->timestamps();
         });
     }
@@ -33,6 +33,6 @@ class WebsiteLogin extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('website_login');
+        Schema::dropIfExists('website_logins');
     }
 }
