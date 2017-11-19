@@ -3,38 +3,45 @@
         <div class="panel-heading">
         	<span class="glyphicon glyphicon-home" @click="closeVault()"></span>
         	Vaults
-        	<button class="btn btn-primary pull-right btn-xs">New Vault</button>
+        	<button class="btn btn-primary pull-right btn-xs" @click="$emit('editvault')">New Vault</button>
         </div>
         <div class="panel-body vaults">
-            <!-- <div class="input-group"> -->
-                <!-- <span class="input-group-btn">
-                    <button class="btn btn-default" type="button"><span class="glyphicon glyphicon-search"></span></button>
-                </span> -->
-            <!-- </div> -->
-            <div class="vault-list-container" :class="{ 'vault-open': vaultOpen }">
-                <input type="text" class="form-control" placeholder="Quick search" v-model="filter">
-	            <br>
-            	<ul>
-            		<li v-for="(vault, index) in filteredVaults" @click="openVault(vault.id)">
-            			{{ vault.title }}
-            			<span class="glyphicon glyphicon-cog pull-right"></span>
-            		</li>
-            		<li v-if="filteredVaults.length === 0">
-            			No vaults found.
-            		</li>
-            	</ul>
-	            <span class="back-btn glyphicon glyphicon-menu-left" @click="closeVault()"></span>
+            <div class="top-level-container" :class="{ 'vault-open': vault !== null }" v-bind:style="topStyles">
+            	<div class="list-level">
+	                <input type="text" class="form-control" placeholder="Filter Vaults" v-model="filter">
+		            <br>
+	            	<ul>
+	            		<li v-for="(vault, index) in filteredVaults" @click="openVault(vault)">
+	            			<span class="glyphicon glyphicon-book"></span>
+	            			{{ vault.title }}
+	            			<span class="glyphicon glyphicon-cog pull-right"></span>
+	            		</li>
+	            		<li v-if="filteredVaults.length === 0">
+	            			No vaults found.
+	            		</li>
+	            	</ul>
+		        </div>
+	            <vault-subfolder ref="subfolder" v-if="vault !== null" :vault="vault" @closevault="closeVault"></vault-subfolder>
             </div>
         </div>
     </div>
 </template>
 
 <script>
+import VaultSubfolder from './VaultSubfolder'
+
 export default {
+
+	components: {
+		VaultSubfolder
+	},
+
 	data () {
 		return {
 			filter: '',
-			vaultOpen: false
+			vault: null,
+			children: [],
+			topStyles: {}
 		}
 	},
 
@@ -56,12 +63,20 @@ export default {
 
 	methods: {
 
-		openVault () {
-			this.vaultOpen = true
+		openVault (vault) {
+			axios.get('api/store/vaults/' + vault.id + '/all').then((res) => {
+				this.vault = res.data
+				this.$nextTick(() => {
+					let el = this.$refs.subfolder
+					this.$set(this.topStyles, 'min-height', el.getHeight() + 'px')
+				})
+			}).catch((err) => console.log(err))
 		},
 
 		closeVault () {
-			this.vaultOpen = false
+			this.vault = null
+			this.children = []
+			this.$set(this.topStyles, 'min-height', '0px')
 		}
 
 	}
@@ -71,16 +86,18 @@ export default {
 <style lang="scss" scoped>
 @import "~@/_variables.scss";
 
-.glyphicon-home {
+.glyphicon-home,
+.glyphicon-book {
 	margin-right: 10px;
 	cursor: pointer;
 }
 
 .vaults {
 	overflow: hidden;
-	.vault-list-container {
-		position: relative;
+	position: relative;
+	.top-level-container {
 		transition: 0.25s;
+
 		ul {
 			padding: 0;
 			margin: 0;
@@ -109,13 +126,6 @@ export default {
 		&.vault-open {
 			transform: translateX(calc(-100% - 15px));
 		}
-	}
-
-	.back-btn {
-		position: absolute;
-		padding: 10px;
-		right: -40px;
-		cursor: pointer;
 	}
 }
 </style>

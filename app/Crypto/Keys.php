@@ -38,7 +38,7 @@ class Keys
         }
 
         foreach ($fields as $value) {
-            if ($value === '') {
+            if (!$value || $value === '') {
                 $result[] = '';
             } else {
                 $result[] = self::encrypt($value, $documentKey);
@@ -70,6 +70,7 @@ class Keys
      */
     public static function rsaEncrypt($data, $key)
     {
+        if (!$data || $data === '') return null;
         $rsa = new RSA();
         $rsa->loadKey($key);
         return base64_encode($rsa->encrypt($data));
@@ -85,6 +86,7 @@ class Keys
      */
     public static function rsaDecrypt($data, $key)
     {
+        if (!$data || $data === '') return null;
         $rsa = new RSA();
         $rsa->loadKey($key);
         return $rsa->decrypt(base64_decode($data));
@@ -99,6 +101,7 @@ class Keys
      */
     public static function encrypt($data, $key)
     {
+        if (!$data || $data === '') return null;
         $aes = new AES();
         $aes->setPassword($key);
         // TODO: implement IV
@@ -115,6 +118,7 @@ class Keys
      */
     public static function decrypt($data, $key)
     {
+        if (!$data || $data === '') return null;
         $aes = new AES();
         $aes->setPassword($key);
         // $aes->setIV(Random::string($aes->getBlockLength() >> 3));

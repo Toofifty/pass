@@ -1,11 +1,25 @@
 <template>
 	<div class="container" id="app">
 	    <div class="col-sm-4">
-	    	<vault-list :vaults="vaults" @vaultrefresh="loadVaults"></vault-list>
+	    	<vault-list
+	    		:vaults="vaults"
+	    		@vaultrefresh="loadVaults"
+	    		@editvault="editVault"
+	    	></vault-list>
 	    </div>
 	    <div class="col-sm-8">
 	    	<!-- <dashboard></dashboard> -->
-	        <edit :vaults="vaults" @vaultrefresh="loadVaults"></edit>
+	        <edit-login
+	        	v-if="!editingVault"
+	        	:vaults="vaults"
+	        	@vaultrefresh="loadVaults"
+	        ></edit-login>
+	        <edit-vault
+	        	v-if="editingVault"
+	        	:vaults="vaults"
+	        	@vaultrefresh="loadVaults"
+	    		@stopeditvault="stopEditVault"
+	        ></edit-vault>
 	        <!-- <note-list></note-list> -->
 	    </div>
 	</div>
@@ -14,7 +28,8 @@
 <script>
 import VaultList from './VaultList'
 import Dashboard from './Dashboard'
-import Edit from './Edit'
+import EditLogin from './EditLogin'
+import EditVault from './EditVault'
 import NoteList from './NoteList'
 
 export default {
@@ -22,13 +37,15 @@ export default {
 	components: {
 		Dashboard,
 		VaultList,
-		Edit,
+		EditLogin,
+		EditVault,
 		NoteList
 	},
 
 	data () {
 		return {
-			vaults: []
+			vaults: [],
+			editingVault: true
 		}
 	},
 
@@ -42,6 +59,15 @@ export default {
 			axios.get('api/store/vaults').then((res) => {
 				this.vaults = res.data
 			})
+		},
+
+		editVault () {
+			// this.editingVault = true
+			this.editingVault = !this.editingVault
+		},
+
+		stopEditVault () {
+			this.editingVault = false
 		}
 
 	}

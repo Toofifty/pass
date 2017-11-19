@@ -8,8 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class Vault extends Model
 {
     protected $guarded = [];
-    protected $appends = ['decrypted_notes'];
-    protected $hidden = ['notes'];
+    protected $appends = [];
+    protected $hidden = [];
 
     /**
      * The users that belong to the note.
@@ -18,21 +18,27 @@ class Vault extends Model
     {
         return $this
             ->belongsToMany('App\User', 'user_vault')
-            ->withPivot();
+            ->withPivot('permission');
     }
 
-    /**
-     * Get the decrypted content using the user's private key.
-     *
-     * @return $string
-     */
-    public function getDecryptedNotesAttribute()
+    public function websiteLogins()
     {
-        if (!$this->notes || $this->notes === '') return $this->notes;
-        
-    	$private = session('private_key');
-    	$document_key = Keys::rsaDecrypt($this->pivot->document_key, $private);
-    	$notes = Keys::decrypt($this->notes, $document_key);
-    	return $notes;
+        return $this
+            ->belongsToMany('App\WebsiteLogin', 'vault_website_login')
+            ->withPivot('permission');
+    }
+
+    public function parents()
+    {
+        return $this
+            ->belongsToMany('App\Vault', 'vault_vault', 'child_id', 'parent_id')
+            ->withPivot('permission');
+    }
+
+    public function children()
+    {
+        return $this
+            ->belongsToMany('App\Vault', 'vault_vault', 'parent_id', 'child_id')
+            ->withPivot('permission');
     }
 }

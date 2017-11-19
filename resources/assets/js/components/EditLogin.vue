@@ -89,7 +89,6 @@ export default {
 				'book'
 			],
 			typeId: 0,
-			alertActive: false,
 			vault: null
 		}
 	},
@@ -115,6 +114,7 @@ export default {
 		vaultList () {
 			return [{
 				title: 'Create new',
+				id: -1,
 				icon: ''
 			}].concat(this.vaults)
 		},
@@ -176,8 +176,6 @@ export default {
 }
 </script>
 
-<style src="vue-multiselect/dist/vue-multiselect.min.css"></style>
-
 <style lang="scss">
 @import '~@/_variables.scss';
 
@@ -199,35 +197,5 @@ export default {
 
 .input-group.multi {
 	width: 100%;
-	.multiselect {
-		width: 100%;
-		z-index: 10;
-		.multiselect__tags {
-			border-color: #ccd0d2;
-			min-height: 36px;
-			padding-top: 6px;
-		}
-		.multiselect__select {
-			height: 36px;
-		}
-		.multiselect__tag {
-			margin-bottom: 1px;
-			background: $brand-primary;
-		}
-		.multiselect__content-wrapper {
-			box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
-		}
-		.multiselect__option--highlight {
-			color: inherit;
-			background: #f5f5f5;
-		}
-		.multiselect__tag-icon:focus,
-		.multiselect__tag-icon:hover {
-			background: $brand-primary;
-		}
-		.multiselect__tag-icon:after {
-			color: white;
-		}
-	}
 }
 </style>
