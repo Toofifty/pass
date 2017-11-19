@@ -37,6 +37,19 @@ class User extends Authenticatable
             ->withPivot('document_key');
     }
 
+    /**
+     * The vaults that belong to the user.
+     */
+    public function vaults()
+    {
+        return $this
+            ->belongsToMany('App\Vault', 'user_vault')
+            ->withPivot('document_key');
+    }
+
+    /**
+     * The website logins that belong to the user.
+     */
     public function websiteLogins()
     {
         return $this

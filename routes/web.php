@@ -24,6 +24,7 @@ Route::get('/notes/new', function () {
 });
 
 Route::prefix('api')->group(function () {
+	Route::resource('store/vaults', 'Store\VaultController');
 	Route::resource('store/notes', 'Store\NoteController');
 	Route::resource('store/websitelogins', 'Store\WebsiteLoginController');
 });

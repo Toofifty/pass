@@ -1,5 +1,4 @@
 body {
-	overflow: hidden;
 	min-height: 100vh;
 
 	&:before {
@@ -9,7 +8,7 @@ body {
 		height: 100%;
 		left: 0;
 		top: 100%;
-		position: absolute;
+		position: fixed;
 		transform-origin: 0 0 0;
 		transform: rotate(-20deg);
 	}
@@ -21,10 +20,14 @@ body {
 		height: 100%;
 		left: 0;
 		top: 100%;
-		position: absolute;
+		position: fixed;
 		transform-origin: 0 0 0;
 		transform: rotate(-21deg);
 		z-index: -1;
 		box-shadow: 0 0 200px darken($body-bg, 4%);
 	}
+}
+
+.btn-primary {
+	border: none;
 }

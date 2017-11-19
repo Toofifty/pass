@@ -10,6 +10,45 @@ use phpseclib\Crypt\Random;
 class Keys
 {
     /**
+     * Encrypt an array of fields using the public key and document key
+     * provided. Document key is generated if not available.
+     *
+     * Extract encrypted content like so:
+     * list($encryptedDocKey, $field1, $field2) = Keys::encryptFields($fields, $publicKey)
+     *
+     * Or if a document key is provided:
+     * list($field1, $field2) = Keys::encryptFields($fields, $publicKey, $documentKey)
+     *
+     * @param array $fields content to encrypt
+     * @param string|null $publicKey user's public key
+     * @param string|null $documentKey
+     * @return array
+     */
+    public static function encryptFields($fields, $publicKey = null, $documentKey = null)
+    {
+        if (!$publicKey) {
+            $publicKey = \Auth::user()->public_key;
+        }
+
+        $result = [];
+        if (!$documentKey) {
+            $documentKey = self::generateKey();
+            $encryptedDocKey = self::rsaEncrypt($documentKey, $publicKey);
+            $result[] = $encryptedDocKey;
+        }
+
+        foreach ($fields as $value) {
+            if ($value === '') {
+                $result[] = '';
+            } else {
+                $result[] = self::encrypt($value, $documentKey);
+            }
+        }
+
+        return $result;
+    }
+
+    /**
      * Generate a new keypair.
      *
      * @return array

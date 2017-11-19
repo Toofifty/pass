@@ -17,6 +17,7 @@ class UserVault extends Migration
             $table->unsignedInteger('user_id');
             $table->unsignedInteger('vault_id');
             $table->primary(['user_id', 'vault_id']);
+            $table->longText('document_key');
             $table->string('permission');
             $table->timestamps();
         });

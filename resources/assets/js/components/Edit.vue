@@ -1,23 +1,25 @@
 <template>
-	<div class="panel panel-default">
-		<div class="panel-heading">
-			{{ isNew() ? 'Add new' : 'Edit' }} entry</div>
-		<div class="panel-body">
-			<form ref="form" action="#" @submit.prevent="submit" class="form-horizontal">
+	<form ref="form" action="#" @submit.prevent="submit" class="form-horizontal">
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				{{ isNew() ? 'Add new' : 'Edit' }} entry
+			</div>
+			<div class="panel-body">
 				<div class="col-lg-2">
 					<icon-upload></icon-upload>
+					<br>
 				</div>
 				<div class="col-lg-10">
 					<label for="title">Title</label>
 					<div class="input-group">
 						<input type="text" class="form-control" placeholder="Title" name="title" required>
-						<div class="input-group-btn">
+						<div class="input-group-btn type-select">
 							<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 								<span class="glyphicon" :class="'glyphicon-' + loginIcons[typeId]"></span>
-								{{ nicefy(loginType) }}
+								<span class="login-type">{{ nicefy(loginType) }}</span>
 								<span class="caret"></span>
 							</button>
-							<ul class="dropdown-menu">
+							<ul class="dropdown-menu dropdown-menu-right">
 								<li v-for="(type, index) in nicefyTypes()">
 									<a href="#" @click="selectType(index)">
 										<span class="glyphicon" :class="'glyphicon-' + loginIcons[index]"></span>
@@ -28,21 +30,39 @@
 						</div>
 					</div>
 					<br>
-					<component :is="loginType"></component>
-					<br>
-					<div class="pull-right" role="group">
-						<button v-if="!isNew()" class="btn btn-danger" @click="deleteLogin()"><span class="glyphicon glyphicon-trash"></span></button>
-						<button type="submit" class="btn btn-primary">{{ isNew() ? 'Add' : 'Update' }}</button>
+					<div class="form-group">
+						<div :class="{ 'col-lg-6': newVaultSelected, 'col-lg-12': !newVaultSelected }">
+							<div class="input-group multi">
+								<label for="vault">Vault</label>
+								<multiselect :options="vaultList" v-model="vault" label="title" :show-labels="false" :multiple="true">
+									<template slot="option" slot-scope="props">
+										{{ props.option.title }}
+									</template>
+								</multiselect>
+							</div>
+						</div>
+						<div v-if="newVaultSelected" class="col-lg-6">
+							<label for="vault-title">New Vault Title</label>
+							<input type="text" class="form-control" placeholder="Vault Title" name="vault-title" required>
+						</div>
 					</div>
+					<component :is="loginType"></component>
 				</div>
-			</form>
+			</div>
+			<div class="panel-footer">
+				<div role="group" class="action-btns">
+					<button v-if="!isNew()" class="btn btn-danger" @click="deleteLogin()"><span class="glyphicon glyphicon-trash"></span></button>
+					<button type="submit" class="btn btn-primary">{{ isNew() ? 'Add' : 'Update' }}</button>
+				</div>
+			</div>
+			<toast ref="toast"></toast>
 		</div>
-		<toast ref="toast"></toast>
-	</div>
+	</form>
 </template>
 
 <script>
 import _ from 'lodash'
+import Multiselect from 'vue-multiselect'
 
 import IconUpload from './IconUpload'
 import WebsiteLogin from './Edit/WebsiteLogin'
@@ -54,7 +74,8 @@ export default {
 		IconUpload,
 		WebsiteLogin,
 		Note,
-		Toast
+		Toast,
+		Multiselect
 	},
 
 	data () {
@@ -64,20 +85,42 @@ export default {
 				'Note'
 			],
 			loginIcons: [
-				'floppy-disk',
+				'globe',
 				'book'
 			],
 			typeId: 0,
-			alertActive: false
+			alertActive: false,
+			vault: null
 		}
 	},
 
-	props: ['loginId'],
+	props: {
+
+		loginId: {
+			type: Number
+		},
+
+		vaults: {
+			type: Array
+		}
+
+	},
 
 	computed: {
 
 		loginType () {
 			return this.loginTypes[this.typeId]
+		},
+
+		vaultList () {
+			return [{
+				title: 'Create new',
+				icon: ''
+			}].concat(this.vaults)
+		},
+
+		newVaultSelected () {
+			return _(this.vault).find(v => v.title === 'Create new')
 		}
 
 	},
@@ -107,7 +150,7 @@ export default {
 			_(event.target.elements).filter(v => v.name !== '').forEach(v => {
 				data[v.name] = v.value
 			})
-			console.log(data)
+			data['vault'] = this.vault
 			if (this.isNew()) {
 				axios.post('api/store/' + this.loginType.toLowerCase() + 's', data).then(() => {
 					this.$refs['toast'].toast(
@@ -117,6 +160,7 @@ export default {
 						true
 					)
 					this.$refs['form'].reset()
+					this.$emit('vaultrefresh')
 				}).catch((err) => {
 					this.$refs['toast'].toast(
 						'danger',
@@ -132,9 +176,58 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
+<style src="vue-multiselect/dist/vue-multiselect.min.css"></style>
+
+<style lang="scss">
+@import '~@/_variables.scss';
+
 .dropdown-menu > li > a {
 	padding: 3px 0px 3px 12px;
 	width: auto;
+}
+
+.type-select {
+	.glyphicon,
+	.login-type {
+		margin-right: 10px;
+	}
+}
+
+.action-btns {
+	text-align: right;
+}
+
+.input-group.multi {
+	width: 100%;
+	.multiselect {
+		width: 100%;
+		z-index: 10;
+		.multiselect__tags {
+			border-color: #ccd0d2;
+			min-height: 36px;
+			padding-top: 6px;
+		}
+		.multiselect__select {
+			height: 36px;
+		}
+		.multiselect__tag {
+			margin-bottom: 1px;
+			background: $brand-primary;
+		}
+		.multiselect__content-wrapper {
+			box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
+		}
+		.multiselect__option--highlight {
+			color: inherit;
+			background: #f5f5f5;
+		}
+		.multiselect__tag-icon:focus,
+		.multiselect__tag-icon:hover {
+			background: $brand-primary;
+		}
+		.multiselect__tag-icon:after {
+			color: white;
+		}
+	}
 }
 </style>

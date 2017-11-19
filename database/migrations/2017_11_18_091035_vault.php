@@ -16,7 +16,7 @@ class Vault extends Migration
         Schema::create('vaults', function (Blueprint $table) {
             $table->increments('id');
             $table->string('title');
-            $table->longText('notes');
+            $table->longText('notes')->nullable();
             $table->binary('icon')->nullable();
             $table->timestamps();
         });

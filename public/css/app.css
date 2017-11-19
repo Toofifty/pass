@@ -8351,7 +8351,6 @@ button.close {
 }
 
 body {
-  overflow: hidden;
   min-height: 100vh;
 }
 
@@ -8362,7 +8361,7 @@ body:before {
   height: 100%;
   left: 0;
   top: 100%;
-  position: absolute;
+  position: fixed;
   -webkit-transform-origin: 0 0 0;
           transform-origin: 0 0 0;
   -webkit-transform: rotate(-20deg);
@@ -8376,7 +8375,7 @@ body:after {
   height: 100%;
   left: 0;
   top: 100%;
-  position: absolute;
+  position: fixed;
   -webkit-transform-origin: 0 0 0;
           transform-origin: 0 0 0;
   -webkit-transform: rotate(-21deg);
@@ -8384,5 +8383,9 @@ body:after {
   z-index: -1;
   -webkit-box-shadow: 0 0 200px #e7eef3;
           box-shadow: 0 0 200px #e7eef3;
+}
+
+.btn-primary {
+  border: none;
 }
 

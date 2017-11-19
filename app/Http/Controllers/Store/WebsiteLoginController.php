@@ -21,16 +21,20 @@ class WebsiteLoginController extends Controller
     		'title' => 'required|max:500'
     	]);
 
-    	// make new document key
-    	$documentKey = Keys::generateKey();
+        $result = Keys::encryptFields([request('password'), request('notes')]);
+        list($encryptedDocKey, $encryptedPassword, $encryptedNotes) = $result;
 
-    	// encrypt password and notes with key
-        $encryptedPassword = Keys::encrypt(request('password'), $documentKey);
-        $encryptedNotes = Keys::encrypt(request('notes'), $documentKey);
+        foreach (request('vault') as $vault) {
+            if ($vault['title'] === 'Create new') {
+                $this->validate($request, [
+                    'vault-title' => 'required|max:500'
+                ]);
+                $vault = VaultController::storeFromLogin($request);
+            }
 
-    	// encrypt key with user public key
-    	$public = \Auth::user()->public_key;
-    	$encryptedDocKey = Keys::rsaEncrypt($documentKey, $public);
+            // TODO: add to existing vaults
+            // Make sure to check if the user has access
+        }
 
     	// push to database
     	$websiteLogin = null;
@@ -57,7 +61,7 @@ class WebsiteLoginController extends Controller
 
     public function destroy($id)
     {
-    	$note = Note::findOrFail($id);
+    	$note = WebsiteLogin::findOrFail($id);
     	$note->delete();
     	return 204;
     }
