@@ -16,6 +16,11 @@ class WebsiteLoginController extends Controller
     	return \Auth::user()->websiteLogins()->get();
     }
 
+    public function show($id)
+    {
+        return \Auth::user()->websiteLogins()->find($id);
+    }
+
     public function store(Request $request)
     {
     	$this->validate($request, [

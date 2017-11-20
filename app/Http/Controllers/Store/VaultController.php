@@ -57,7 +57,7 @@ class VaultController extends Controller
 
     	// push to database
     	$vault = null;
-    	\DB::transaction(function () use ($encryptedDocKey) {
+    	\DB::transaction(function () use ($vault, $encryptedDocKey) {
 			$vault = Vault::create([
 	    		'title' => request('title'),
 	    		'notes' => request('notes'),
@@ -83,6 +83,49 @@ class VaultController extends Controller
 	    	]);
     	});
     	return $vault;
+    }
+
+    public function update(Request $request, $id)
+    {
+        $vault = null;
+        \DB::transaction(function () use ($id, $vault) {
+            $vault = Vault::with('parents')->findOrFail($id);
+
+            $parentIds = function ($parent) {
+                return $parent['id'];
+            };
+
+            $parents = request('parents');
+            if (!$parents) {
+                $parents = [];
+            }
+
+            $oldParents = array_map($parentIds, $vault->parents->toArray());
+            $newParents = array_map($parentIds, $parents);
+
+            $createdParents = array_diff($newParents, $oldParents);
+            $deletedParents = array_diff($oldParents, $newParents);
+
+            $vault->update([
+                'title' => request('title'),
+                'notes' => request('notes'),
+                'icon' => request('icon'),
+                'top_level' => !request('parents') || request('parents') === null
+            ]);
+            
+            foreach ($deletedParents as $deletedId) {
+                VaultVault::where('child_id', $id)->where('parent_id', $deletedId)->delete();
+            }
+
+            foreach ($createdParents as $createdId) {
+                VaultVault::create([
+                    'parent_id' => $createdId,
+                    'child_id' => $id,
+                    'permission' => '???'
+                ]);
+            }
+        });
+        return $vault;
     }
 
     public function destroy($id)

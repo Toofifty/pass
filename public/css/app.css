@@ -8385,7 +8385,8 @@ body:after {
           box-shadow: 0 0 200px #e7eef3;
 }
 
-.btn-primary {
+.btn-primary,
+.btn-danger {
   border: none;
 }
 

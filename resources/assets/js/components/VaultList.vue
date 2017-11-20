@@ -14,27 +14,23 @@
 	            		<li v-for="(vault, index) in filteredVaults" @click="openVault(vault)">
 	            			<span class="glyphicon glyphicon-book"></span>
 	            			{{ vault.title }}
-	            			<span class="glyphicon glyphicon-cog pull-right"></span>
+	            			<span class="glyphicon glyphicon-cog pull-right" @click.stop="editVault(vault)"></span>
 	            		</li>
 	            		<li v-if="filteredVaults.length === 0">
 	            			No vaults found.
 	            		</li>
 	            	</ul>
 		        </div>
-	            <vault-subfolder ref="subfolder" v-if="vault !== null" :vault="vault" @closevault="closeVault"></vault-subfolder>
+	            <vault-subfolder ref="subfolder" v-if="vault !== null" :parent="vault" :topStyles="topStyles" @closevault="closeVault" @editvault="editVault" @viewlogin="viewLogin"></vault-subfolder>
             </div>
         </div>
     </div>
 </template>
 
 <script>
-import VaultSubfolder from './VaultSubfolder'
+Vue.component('vault-subfolder', require('./VaultSubfolder.vue'))
 
 export default {
-
-	components: {
-		VaultSubfolder
-	},
 
 	data () {
 		return {
@@ -75,8 +71,15 @@ export default {
 
 		closeVault () {
 			this.vault = null
-			this.children = []
 			this.$set(this.topStyles, 'min-height', '0px')
+		},
+
+		editVault (vault) {
+			this.$emit('editvault', vault)
+		},
+
+		viewLogin (login, edit) {
+			this.$emit('viewlogin', login, edit)
 		}
 
 	}
@@ -120,6 +123,10 @@ export default {
 
 				&:last-child {
 					border-bottom: none;
+				}
+
+				&:hover {
+					background: #f5f5f5;
 				}
 			}
 		}

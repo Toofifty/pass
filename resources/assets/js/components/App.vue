@@ -5,17 +5,23 @@
 	    		:vaults="vaults"
 	    		@vaultrefresh="loadVaults"
 	    		@editvault="editVault"
+	    		@viewlogin="viewLogin"
 	    	></vault-list>
 	    </div>
 	    <div class="col-sm-8">
 	    	<!-- <dashboard></dashboard> -->
 	        <edit-login
-	        	v-if="!editingVault"
+	        	v-if="editingLogin"
+	        	:login="login"
+	        	:edit="editLogin"
 	        	:vaults="vaults"
 	        	@vaultrefresh="loadVaults"
+	    		@viewlogin="viewLogin"
+	        	@stopviewlogin="stopViewLogin"
 	        ></edit-login>
 	        <edit-vault
 	        	v-if="editingVault"
+	        	:vault="vault"
 	        	:vaults="vaults"
 	        	@vaultrefresh="loadVaults"
 	    		@stopeditvault="stopEditVault"
@@ -45,12 +51,27 @@ export default {
 	data () {
 		return {
 			vaults: [],
-			editingVault: true
+			vault: null,
+			login: null,
+			editLogin: false,
+			editType: 'login'
 		}
 	},
 
 	mounted () {
 		this.loadVaults()
+	},
+
+	computed: {
+
+		editingVault () {
+			return this.editType === 'vault'
+		},
+
+		editingLogin () {
+			return this.editType === 'login'
+		}
+
 	},
 
 	methods: {
@@ -61,13 +82,34 @@ export default {
 			})
 		},
 
-		editVault () {
-			// this.editingVault = true
-			this.editingVault = !this.editingVault
+		editVault (vault) {
+			// this.vault = true
+			this.vault = vault
+			this.login = null
+			this.editType = 'vault'
 		},
 
 		stopEditVault () {
-			this.editingVault = false
+			this.vault = null
+			this.editType = 'login'
+		},
+
+		viewLogin (login, edit) {
+			if (!this.login || login.id !== this.login.id) {
+				axios.get('api/store/websitelogins/' + login.id).then((res) => {
+					this.login = res.data
+				}).catch((err) => console.error(err))
+			}
+			this.login = login
+			this.vault = null
+			this.editType = 'login'
+			this.editLogin = edit
+		},
+
+		stopViewLogin () {
+			this.login = null
+			this.editType = 'login'
+			this.editLogin = false
 		}
 
 	}
