@@ -10,6 +10,12 @@
 	    </div>
 	    <div class="col-sm-8">
 	    	<!-- <dashboard></dashboard> -->
+			<view-edit
+				ref="view"
+				:vaults="vaults"
+				:target="target"
+				@vaultRefresh="loadVaults"
+			></view-edit>
 	        <edit-login
 	        	v-if="editingLogin"
 	        	:login="login"
@@ -38,6 +44,8 @@ import EditLogin from './EditLogin'
 import EditVault from './EditVault'
 import NoteList from './NoteList'
 
+import ViewEdit from './ViewEdit'
+
 export default {
 
 	components: {
@@ -45,7 +53,8 @@ export default {
 		VaultList,
 		EditLogin,
 		EditVault,
-		NoteList
+		NoteList,
+		ViewEdit
 	},
 
 	data () {
@@ -54,7 +63,8 @@ export default {
 			vault: null,
 			login: null,
 			editLogin: false,
-			editType: 'login'
+			editType: 'login',
+			target: null
 		}
 	},
 
@@ -83,6 +93,7 @@ export default {
 		},
 
 		editVault (vault) {
+			this.$refs.view.selectType('')
 			// this.vault = true
 			this.vault = vault
 			this.login = null
@@ -95,15 +106,13 @@ export default {
 		},
 
 		viewLogin (login, edit) {
-			if (!this.login || login.id !== this.login.id) {
-				axios.get('api/store/websitelogins/' + login.id).then((res) => {
-					this.login = res.data
-				}).catch((err) => console.error(err))
-			}
-			this.login = login
-			this.vault = null
-			this.editType = 'login'
-			this.editLogin = edit
+			axios.get('api/store/websitelogins/' + login.id)
+				.then((res) => {
+					this.target = res.data
+					this.$refs.view.selectType('websitelogin')
+					this.$refs.view.forceView()
+				})
+				.catch((err) => console.error(err))
 		},
 
 		stopViewLogin () {

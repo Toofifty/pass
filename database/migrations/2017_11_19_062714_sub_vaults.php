@@ -37,6 +37,6 @@ class SubVaults extends Migration
             $table->dropColumn('top_level');
         });
 
-        Schema::dropIfExists('vaults');
+        Schema::dropIfExists('vault_vault');
     }
 }

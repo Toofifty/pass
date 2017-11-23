@@ -29,9 +29,17 @@ class VaultController extends Controller
 
         // push to database
         $vault = null;
-        \DB::transaction(function () use ($encryptedDocKey) {
+        \DB::transaction(function () use (&$vault, $encryptedDocKey) {
+            $title = '';
+            foreach (request('vaults') as $reqVault) {
+                if ($reqVault['id'] === -1) {
+                    $title = $reqVault['title'];
+                    break;
+                }
+            }
+
             $vault = Vault::create([
-                'title' => request('vault-title'),
+                'title' => $title,
                 'notes' => null,
                 'top_level' => true,
                 'icon' => null
@@ -44,6 +52,7 @@ class VaultController extends Controller
                 'permission' => 'owner'
             ]);
         });
+        \Log::info(json_encode($vault));
         return $vault;
     }
 

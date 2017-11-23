@@ -21,6 +21,13 @@ class WebsiteLogin extends Model
             ->using('App\Relation\UserWebsiteLogin');
     }
 
+    public function vaults()
+    {
+        return $this
+            ->belongsToMany('App\Model\Vault', 'vault_website_login')
+            ->using('App\Relation\VaultWebsiteLogin');
+    }
+
     /**
      * Get the decrypted password using the user's private key.
      *
