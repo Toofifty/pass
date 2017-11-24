@@ -22,7 +22,7 @@
                 :value="value"
                 @input="update($event.target.value)"
                 :rows="height"
-            ></component>
+            >{{ value }}</component>
             <component :is="component"
                 v-if="tooltip"
                 :name="name"
@@ -34,7 +34,7 @@
                 data-placement="bottom"
                 :title="tooltip"
                 :rows="height"
-            ></component>
+            >{{ value }}</component>
         </div>
         <div v-if="!edit && value" class="view-field form-control">{{ value }}</div>
         <div v-if="!edit && !value" class="view-field form-control"><i>None</i></div>

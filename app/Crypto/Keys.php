@@ -17,24 +17,30 @@ class Keys
      * list($encryptedDocKey, $field1, $field2) = Keys::encryptFields($fields, $publicKey)
      *
      * Or if a document key is provided:
-     * list($field1, $field2) = Keys::encryptFields($fields, $publicKey, $documentKey)
+     * list($field1, $field2) = Keys::encryptFields($fields, null, $encryptedDocKey, $privateKey)
      *
      * @param array $fields content to encrypt
      * @param string|null $publicKey user's public key
-     * @param string|null $documentKey
+     * @param string|null $encryptedDocKey
+     * @param string|null $privateKey
      * @return array
      */
-    public static function encryptFields($fields, $publicKey = null, $documentKey = null)
+    public static function encryptFields($fields, $publicKey = null, $encryptedDocKey = null, $privateKey = null)
     {
         if (!$publicKey) {
             $publicKey = \Auth::user()->public_key;
         }
 
         $result = [];
-        if (!$documentKey) {
+        if (!$encryptedDocKey) {
             $documentKey = self::generateKey();
             $encryptedDocKey = self::rsaEncrypt($documentKey, $publicKey);
             $result[] = $encryptedDocKey;
+        } else {
+            if (!$privateKey) {
+                $privateKey = session('private_key');
+            }
+            $documentKey = self::rsaDecrypt($encryptedDocKey, $privateKey);
         }
 
         foreach ($fields as $value) {

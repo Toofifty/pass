@@ -5,11 +5,9 @@ namespace App\Model;
 use App\Crypto\Keys;
 use Illuminate\Database\Eloquent\Model;
 
-class WebsiteLogin extends Model
+class WebsiteLogin extends Encryptable
 {
     protected $guarded = [];
-    protected $appends = ['decrypted_password', 'decrypted_notes'];
-    protected $hidden = ['password', 'notes'];
 
     /**
      * The users that belong to the note.
@@ -17,7 +15,7 @@ class WebsiteLogin extends Model
     public function users()
     {
         return $this
-            ->belongsToMany('App\Model\User', 'user_website_login')
+            ->belongsToMany('App\User', 'user_website_login')
             ->using('App\Relation\UserWebsiteLogin');
     }
 
@@ -33,12 +31,9 @@ class WebsiteLogin extends Model
      *
      * @return $string
      */
-    public function getDecryptedPasswordAttribute()
+    public function getPasswordAttribute($encrypted)
     {
-        $private = session('private_key');
-        $document_key = Keys::rsaDecrypt($this->pivot->document_key, $private);
-        $content = Keys::decrypt($this->password, $document_key);
-        return $content;
+        return $this->getDecryptedContent($encrypted);
     }
 
     /**
@@ -46,11 +41,8 @@ class WebsiteLogin extends Model
      *
      * @return $string
      */
-    public function getDecryptedNotesAttribute()
+    public function getNotesAttribute($encrypted)
     {
-        $private = session('private_key');
-        $document_key = Keys::rsaDecrypt($this->pivot->document_key, $private);
-        $content = Keys::decrypt($this->notes, $document_key);
-        return $content ?: '';
+        return $this->getDecryptedContent($encrypted);
     }
 }

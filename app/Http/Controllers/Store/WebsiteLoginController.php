@@ -29,6 +29,8 @@ class WebsiteLoginController extends Controller
 
         $result = Keys::encryptFields([request('password'), request('notes')]);
         list($encryptedDocKey, $encryptedPassword, $encryptedNotes) = $result;
+        \Log::info('store');
+        \Log::info($encryptedPassword);
 
         // push to database
         $websiteLogin = null;

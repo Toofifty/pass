@@ -8,8 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 class Note extends Model
 {
     protected $guarded = [];
-    protected $appends = ['decrypted_content'];
-    protected $hidden = ['content'];
 
     /**
      * The users that belong to the note.
@@ -26,11 +24,8 @@ class Note extends Model
      *
      * @return $string
      */
-    public function getDecryptedContentAttribute()
+    public function getContentAttribute($encrypted)
     {
-    	$private = session('private_key');
-    	$document_key = Keys::rsaDecrypt($this->pivot->document_key, $private);
-    	$content = Keys::decrypt($this->content, $document_key);
-    	return $content;
+    	return $this->getDecryptedContent($encrypted);
     }
 }

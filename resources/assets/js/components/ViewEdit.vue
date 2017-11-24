@@ -14,7 +14,7 @@
 				<div class="col-lg-2">
 					<icon-upload></icon-upload>
 				</div>
-				<div class="col-lg-10 form-group">
+				<div v-if="isEditMode" class="col-lg-10 form-group">
 					<label for="title">Title</label>
 					<div class="input-group">
 						<input type="text" class="form-control" placeholder="Title" name="title" v-model="data['title']" required>
@@ -22,9 +22,9 @@
 							<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 								<span class="glyphicon" :class="'glyphicon-' + stencil.icon"></span>
 								<span class="login-type">{{ stencil.title }}</span>
-								<span class="caret"></span>
+								<span v-if="isNew" class="caret"></span>
 							</button>
-							<ul class="dropdown-menu dropdown-menu-right">
+							<ul v-if="isNew" class="dropdown-menu dropdown-menu-right">
 								<li v-bind:key="index" v-for="(type, index) in allTypes">
 									<a href="#" @click="selectType(type.type)">
 										<span class="glyphicon" :class="'glyphicon-' + type.icon"></span>
@@ -34,6 +34,10 @@
 							</ul>
 						</div>
 					</div>
+				</div>
+				<div v-if="!isEditMode" class="col-lg-10 form-group">
+					<label for="title">Title</label>
+					<div class="form-control">{{ data.title }}</div>
 				</div>
 				<div v-if="stencil.vault" :class="'col-lg-' + (stencil.vault.size || 12)">
 					<VaultEntry
@@ -59,12 +63,17 @@
 				</div>
 			</div>
 			<div class="panel-footer">
+				<div class="panel-btn-group left-btns">
+					<button v-if="isViewing" class="btn btn-secondary" @click.prevent="$emit('clearTarget')">Cancel</span></button>
+					<button v-if="isEditing" class="btn btn-secondary" @click.prevent="forceView">Cancel</span></button>
+				</div>
 				<div v-if="isViewing" role="group" class="panel-btn-group right-btns">
 					<button class="btn btn-secondary" @click.prevent="debug">Share</button>
 					<button class="btn btn-primary" @click.prevent="editing = !editing">Edit</button>
 				</div>
 				<div v-if="isEditing" role="group" class="panel-btn-group right-btns">
 					<button class="btn btn-danger" @click.prevent="debug">Debug</button>
+					<button class="btn btn-danger" @click.prevent="deleteEntry">Delete<span class="glyphicon glyphicon-trash"></span></button>
 					<button class="btn btn-primary">Update</button>
 				</div>
 				<div v-if="isNew && isEditMode" role="group" class="panel-btn-group right-btns">
@@ -162,6 +171,7 @@ export default {
 			// confirm the user will lose their changes
 			console.log(newTarget)
 			this.data = JSON.parse(JSON.stringify(newTarget))
+			if (!this.data) this.data = {}
 		})
 
 		// update the stencil on initial load
@@ -303,6 +313,18 @@ export default {
 			} else {
 				this.onFail('Something went wrong. Please refresh the page.');
 			}
+		},
+
+		deleteEntry () {
+			axios.delete('api/store/' + this.targetType + 's/' + this.data.id)
+				.then(() => {
+					this.onSuccess(this.stencil.title + ' deleted.')
+					this.data = {}
+					this.$emit('clearTarget')
+				})
+				.catch((err) => {
+					this.onFail(err.toString().replace(/Error: /, ''))
+				})
 		}
 
 	}

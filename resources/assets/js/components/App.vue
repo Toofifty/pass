@@ -15,24 +15,8 @@
 				:vaults="vaults"
 				:target="target"
 				@vaultRefresh="loadVaults"
+				@clearTarget="clearTarget"
 			></view-edit>
-	        <edit-login
-	        	v-if="editingLogin"
-	        	:login="login"
-	        	:edit="editLogin"
-	        	:vaults="vaults"
-	        	@vaultrefresh="loadVaults"
-	    		@viewlogin="viewLogin"
-	        	@stopviewlogin="stopViewLogin"
-	        ></edit-login>
-	        <edit-vault
-	        	v-if="editingVault"
-	        	:vault="vault"
-	        	:vaults="vaults"
-	        	@vaultrefresh="loadVaults"
-	    		@stopeditvault="stopEditVault"
-	        ></edit-vault>
-	        <!-- <note-list></note-list> -->
 	    </div>
 	</div>
 </template>
@@ -40,9 +24,6 @@
 <script>
 import VaultList from './VaultList'
 import Dashboard from './Dashboard'
-import EditLogin from './EditLogin'
-import EditVault from './EditVault'
-import NoteList from './NoteList'
 
 import ViewEdit from './ViewEdit'
 
@@ -51,9 +32,6 @@ export default {
 	components: {
 		Dashboard,
 		VaultList,
-		EditLogin,
-		EditVault,
-		NoteList,
 		ViewEdit
 	},
 
@@ -93,11 +71,9 @@ export default {
 		},
 
 		editVault (vault) {
-			this.$refs.view.selectType('')
-			// this.vault = true
-			this.vault = vault
-			this.login = null
-			this.editType = 'vault'
+			this.$refs.view.selectType('vault')
+			this.target = vault
+			this.$refs.view.forceView()
 		},
 
 		stopEditVault () {
@@ -119,6 +95,10 @@ export default {
 			this.login = null
 			this.editType = 'login'
 			this.editLogin = false
+		},
+
+		clearTarget () {
+			this.target = null
 		}
 
 	}
