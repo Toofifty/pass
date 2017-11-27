@@ -4,7 +4,7 @@
 <template>
     <div class="form-group">
         <label :for="name">{{ title }}</label>
-        <div v-if="edit" :class="{ 'input-group': encrypted }">
+        <div v-if="edit" :class="{ 'input-group': encrypted || copyable }">
             <span
                 v-if="encrypted"
                 class="input-group-addon"
@@ -15,6 +15,7 @@
                 <span class="glyphicon glyphicon-lock"></span>
             </span>
             <component :is="component"
+                :id="name"
                 v-if="!tooltip"
                 :name="name"
                 class="form-control"
@@ -24,6 +25,7 @@
                 :rows="height"
             >{{ value }}</component>
             <component :is="component"
+                :id="name"
                 v-if="tooltip"
                 :name="name"
                 class="form-control"
@@ -35,13 +37,44 @@
                 :title="tooltip"
                 :rows="height"
             >{{ value }}</component>
+            <div v-if="copyable" class="input-group-btn">
+                <button
+                    :id="'copy-' + name"
+                    @click.prevent
+                    class="btn btn-default"
+                    data-toggle="tooltip"
+                    data-placement="bottom"
+                    title="Copy to clipboard"
+                    :data-clipboard-target="'#' + this.name"
+                >
+                    <span class="glyphicon glyphicon-copy"></span>
+                </button>
+            </div>
         </div>
-        <div v-if="!edit && value" class="view-field form-control">{{ value }}</div>
+        <div v-if="!edit && value && !copyable" class="view-field form-control">{{ value }}</div>
+        <div v-if="!edit && value && copyable" class="input-group">
+            <div :id="name" class="view-field form-control">{{ value }}</div>
+            <div class="input-group-btn standalone">
+                <button
+                    :id="'copy-' + name"
+                    @click.prevent
+                    class="btn btn-default"
+                    data-toggle="tooltip"
+                    data-placement="bottom"
+                    title="Copy to clipboard"
+                    :data-clipboard-target="'#' + name"
+                >
+                    <span class="glyphicon glyphicon-copy"></span>
+                </button>
+            </div>
+        </div>
         <div v-if="!edit && !value" class="view-field form-control"><i>None</i></div>
     </div>
 </template>
 
 <script>
+import Clipboard from 'clipboard'
+
 export default {
 
     props: {
@@ -72,6 +105,10 @@ export default {
 
         encrypted: {
             type: Boolean
+        },
+
+        copyable: {
+            type: Boolean
         }
 
     },
@@ -93,15 +130,8 @@ export default {
     mounted () {
 
         // trigger tooltips if editing is enabled
-        this.$watch('edit', () => {
-            if (this.tooltip || this.encrypted) {
-                $('[data-toggle="tooltip"]').tooltip()
-            }
-        })
-
-        if (this.tooltip || this.encrypted) {
-            $('[data-toggle="tooltip"]').tooltip()
-        }
+        this.$watch('edit', this.initialize)
+        this.initialize()
 
     },
 
@@ -113,6 +143,16 @@ export default {
          */
         update (value) {
             this.$emit('input', value)
+        },
+
+        initialize () {
+            if (this.tooltip || this.encrypted) {
+                $('[data-toggle="tooltip"]').tooltip()
+            }
+
+            if (this.copyable) {
+                let clip = new Clipboard('#copy-' + this.name)
+            }
         }
 
     }
@@ -125,6 +165,13 @@ export default {
     border-color: transparent;
     i {
         opacity: 0.5;
+    }
+}
+
+.input-group-btn.standalone {
+    &:last-child > .btn:first-child {
+        border-bottom-left-radius: 4px;
+        border-top-left-radius: 4px;
     }
 }
 </style>

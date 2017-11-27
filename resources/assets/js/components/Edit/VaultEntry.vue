@@ -172,4 +172,8 @@ export default {
         opacity: 0.5;
     }
 }
+
+.input-group.multi {
+	width: 100%;
+}
 </style>

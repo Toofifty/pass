@@ -15,6 +15,7 @@
                 <span class="glyphicon glyphicon-lock"></span>
             </span>
             <input
+                :id="fieldType === 'password' ? '' : name"
                 v-if="!tooltip"
                 :type="fieldType"
                 :name="name"
@@ -25,6 +26,7 @@
                 autocomplete="new-password"
             >
             <input
+                :id="fieldType === 'password' ? '' : name"
                 v-if="tooltip"
                 :type="fieldType"
                 :name="name"
@@ -37,16 +39,19 @@
                 :title="tooltip"
                 autocomplete="new-password"
             >
+            <div style="display:none;opacity:0;height:0;visibility:hidden" :id="name" v-if="fieldType === 'password'">{{ value }}</div>
             <div class="input-group-btn">
                 <button @click.prevent="visible = !visible" class="btn btn-default">
                     <span :class="'glyphicon-eye-' + (visible ? 'close' : 'open')" class="glyphicon"></span>
                 </button>
                 <button
+                    :id="'copy-' + name"
                     @click.prevent
                     class="btn btn-default"
                     data-toggle="tooltip"
                     data-placement="bottom"
                     title="Copy to clipboard"
+                    :data-clipboard-target="'#' + name"
                 >
                     <span class="glyphicon glyphicon-copy"></span>
                 </button>
@@ -68,11 +73,13 @@
                     <span :class="'glyphicon-eye-' + (visible ? 'close' : 'open')" class="glyphicon"></span>
                 </button>
                 <button
+                    :id="'copy-' + name"
                     @click.prevent
                     class="btn btn-default"
                     data-toggle="tooltip"
                     data-placement="bottom"
                     title="Copy to clipboard"
+                    :data-clipboard-target="'#' + name"
                 >
                     <span class="glyphicon glyphicon-copy"></span>
                 </button>
@@ -83,6 +90,8 @@
 </template>
 
 <script>
+import Clipboard from 'clipboard'
+
 export default {
 
     data () {
@@ -115,18 +124,18 @@ export default {
 
         encrypted: {
             type: Boolean
+        },
+
+        copyable: {
+            type: Boolean
         }
 
     },
 
     mounted () {
 
-        // trigger tooltips if editing is enabled
-        this.$watch('edit', () => {
-            $('[data-toggle="tooltip"]').tooltip()
-        })
-
-        $('[data-toggle="tooltip"]').tooltip()
+        this.$watch('edit', this.initialize)
+        this.initialize()
 
     },
 
@@ -154,6 +163,17 @@ export default {
     },
 
     methods: {
+
+        /**
+         * Initialise any library functionality in
+         * the component
+         */
+        initialize () {
+            $('[data-toggle="tooltip"]').tooltip()
+            if (this.copyable) {
+                let clip = new Clipboard('#copy-' + this.name)
+            }
+        },
 
         /**
          * Emit the value to the parent (enables v-model binding)

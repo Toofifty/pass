@@ -37,7 +37,7 @@
 				</div>
 				<div v-if="!isEditMode" class="col-lg-10 form-group">
 					<label for="title">Title</label>
-					<div class="form-control">{{ data.title }}</div>
+					<div class="form-control view-field">{{ data.title }}</div>
 				</div>
 				<div v-if="stencil.vault" :class="'col-lg-' + (stencil.vault.size || 12)">
 					<VaultEntry
@@ -59,6 +59,7 @@
 						:tooltip="field.tooltip"
 						:encrypted="field.encrypted"
 						:height="field.height"
+						:copyable="field.copyable"
 					></component>
 				</div>
 			</div>
@@ -163,6 +164,9 @@ export default {
 		// type
 		this.$watch('targetType', (newType) => {
 			this.stencil = Stencil.get(newType)
+			if (this.stencil.initialize) {
+				this.stencil.initialize(this)
+			}
 		})
 
 		this.$watch('target', (newTarget) => {
@@ -176,6 +180,9 @@ export default {
 
 		// update the stencil on initial load
 		this.stencil = Stencil.get(this.targetType)
+		if (this.stencil.initialize) {
+			this.stencil.initialize(this)
+		}
 
 	},
 
@@ -333,6 +340,13 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.view-field {
+    border-color: transparent;
+    i {
+        opacity: 0.5;
+    }
+}
+
 .right-btns {
 	float: right;
 }

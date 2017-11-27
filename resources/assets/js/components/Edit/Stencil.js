@@ -17,7 +17,8 @@ export default {
                 "url": {
                     "title": "URL",
                     "component": "PlainText",
-                    "size": 6
+                    "size": 6,
+                    "copyable": true
                 },
                 "domain": {
                     "title": "Domain",
@@ -28,6 +29,7 @@ export default {
                 "username": {
                     "title": "Username",
                     "component": "PlainText",
+                    "copyable": true,
                     "size": 6
                 },
                 "password": {
@@ -44,6 +46,15 @@ export default {
                     "encrypted": true,
                     "height": 3
                 }
+            },
+            initialize (view) {
+                view.$watch('data.url', (newVal, oldVal) => {
+                    let snip = (url) => url.replace(/https?:\/\//, '').replace(/\/.*/, '') 
+                    if (oldVal === undefined || snip(oldVal) === view.data.domain) {
+                        view.data.domain = snip(newVal)
+                        view.$forceUpdate()
+                    }
+                })
             }
         },
         {
