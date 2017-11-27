@@ -63,7 +63,7 @@
 				</div>
 			</div>
 			<div class="panel-footer">
-				<div class="panel-btn-group left-btns">
+				<div v-if="isViewing || isEditing" class="panel-btn-group left-btns">
 					<button v-if="isViewing" class="btn btn-secondary" @click.prevent="$emit('clearTarget')">Cancel</span></button>
 					<button v-if="isEditing" class="btn btn-secondary" @click.prevent="forceView">Cancel</span></button>
 				</div>
@@ -331,3 +331,17 @@ export default {
 
 }
 </script>
+
+<style lang="scss" scoped>
+.right-btns {
+	float: right;
+}
+
+.left-btns {
+	float: left;
+}
+
+.clear-both {
+	clear: both;
+}
+</style>
