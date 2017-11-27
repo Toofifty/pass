@@ -72,7 +72,7 @@ export default {
 
 		editVault (vault) {
 			this.$refs.view.selectType('vault')
-			this.target = vault
+			this.target = null
 			this.$refs.view.forceView()
 		},
 

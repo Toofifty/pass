@@ -71,11 +71,11 @@ class VaultController extends Controller
 	    		'title' => request('title'),
 	    		'notes' => request('notes'),
                 'icon' => request('icon'),
-                'top_level' => !request('parents') || request('parents') === null
+                'top_level' => !request('vaults') || request('vaults') === null
 	    	]);
 
-            if (request('parents') !== null) {
-                foreach (request('parents') as $parent) {
+            if (request('vaults') !== null) {
+                foreach (request('vaults') as $parent) {
                     VaultVault::create([
                         'parent_id' => $parent['id'],
                         'child_id' => $vault->id,
@@ -104,7 +104,7 @@ class VaultController extends Controller
                 return $parent['id'];
             };
 
-            $parents = request('parents');
+            $parents = request('vaults');
             if (!$parents) {
                 $parents = [];
             }
@@ -119,7 +119,7 @@ class VaultController extends Controller
                 'title' => request('title'),
                 'notes' => request('notes'),
                 'icon' => request('icon'),
-                'top_level' => !request('parents') || request('parents') === null
+                'top_level' => !request('vaults') || request('vaults') === null
             ]);
             
             foreach ($deletedParents as $deletedId) {
@@ -139,8 +139,11 @@ class VaultController extends Controller
 
     public function destroy($id)
     {
-    	$note = Vault::findOrFail($id);
-    	$note->delete();
+        $vault = Vault::findOrFail($id);
+        $vault->websiteLogins()->detach();
+        $vault->users()->detach();
+        $vault->vaults()->detach();
+    	$vault->delete();
     	return 204;
     }
 }

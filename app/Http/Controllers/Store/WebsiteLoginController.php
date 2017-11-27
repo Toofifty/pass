@@ -131,8 +131,10 @@ class WebsiteLoginController extends Controller
 
     public function destroy($id)
     {
-    	$note = WebsiteLogin::findOrFail($id);
-    	$note->delete();
+        $websiteLogin = WebsiteLogin::findOrFail($id);
+        $websiteLogin->vaults()->detach();
+        $websiteLogin->users()->detach();
+    	$websiteLogin->delete();
     	return 204;
     }
 }

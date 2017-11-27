@@ -52,7 +52,9 @@ class NoteController extends Controller
 
     public function destroy($id)
     {
-    	$note = Note::findOrFail($id);
+		$note = Note::findOrFail($id);
+		$note->vaults()->detach();
+		$note->users()->detach();
     	$note->delete();
     	return 204;
     }
